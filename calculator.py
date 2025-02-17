@@ -1,47 +1,58 @@
 import tkinter as tk
+from typing import Any
 
 
-class CalculatorApp:
-    def __init__(self, root):
-        self.root = root
+class Calculator:
+    def __init__(self) -> None:
+        self.root = tk.Tk()
         self.root.title("Калькулятор")
-        self.root.geometry("300x400")
 
-        self.entry = tk.Entry(
-            root, width=20, font=("Arial", 18), bd=5, relief=tk.GROOVE
-        )
-        self.entry.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
+        self.entry = tk.Entry(self.root, font=("Arial", 18), justify="right")
+        self.entry.pack(fill="both", expand=True)
 
-        self.create_buttons()
-
-    def create_buttons(self):
-        buttons = [
-            ("7", 1, 0),
-            ("8", 1, 1),
-            ("9", 1, 2),
-            ("/", 1, 3),
-            ("4", 2, 0),
-            ("5", 2, 1),
-            ("6", 2, 2),
-            ("*", 2, 3),
-            ("1", 3, 0),
-            ("2", 3, 1),
-            ("3", 3, 2),
-            ("-", 3, 3),
-            ("0", 4, 0),
-            (".", 4, 1),
-            ("=", 4, 2),
-            ("+", 4, 3),
+        self.buttons = [
+            ["7", "8", "9", "/"],
+            ["4", "5", "6", "*"],
+            ["1", "2", "3", "-"],
+            ["0", "C", "=", "+"],
         ]
 
-        for text, row, col in buttons:
-            button = tk.Button(
-                self.root, text=text, font=("Arial", 14), width=5, height=2
-            )
-            button.grid(row=row, column=col, padx=5, pady=5)
+        for row in self.buttons:
+            frame = tk.Frame(self.root)
+            frame.pack(expand=True, fill="both")
+            for text in row:
+                button = tk.Button(
+                    frame,
+                    text=text,
+                    font=("Arial", 18),
+                    command=self.create_command(text),
+                )
+                button.pack(side="left", expand=True, fill="both")
+
+    def create_command(self, text: str) -> Any:
+        def on_button_click() -> None:
+            self.on_click(text)
+
+        return on_button_click
+
+    def on_click(self, text: str) -> None:
+        if text == "C":
+            self.entry.delete(0, tk.END)
+        elif text == "=":
+            try:
+                result = str(eval(self.entry.get()))
+                self.entry.delete(0, tk.END)
+                self.entry.insert(tk.END, result)
+            except Exception:
+                self.entry.delete(0, tk.END)
+                self.entry.insert(tk.END, "Error")
+        else:
+            self.entry.insert(tk.END, text)
+
+    def run(self) -> None:
+        self.root.mainloop()
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = CalculatorApp(root)
-    root.mainloop()
+    calculator = Calculator()
+    calculator.run()
